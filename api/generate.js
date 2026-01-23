@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Solo permitir POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -11,14 +10,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // Modelo más barato y rápido
+        model: 'deepseek-chat', // Modelo más barato y bueno
         messages: [
           {
             role: 'system',
@@ -50,14 +49,15 @@ El título debe ser atractivo con keywords relevantes. La descripción debe incl
           }
         ],
         temperature: 0.7,
-        max_tokens: 1000
+        max_tokens: 1000,
+        stream: false
       })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Error en la API de OpenAI');
+      throw new Error(data.error?.message || 'Error en la API de DeepSeek');
     }
 
     const content = data.choices[0].message.content;
@@ -75,3 +75,8 @@ El título debe ser atractivo con keywords relevantes. La descripción debe incl
     });
   }
 }
+```
+
+### 2️⃣ Actualiza **.env.local**
+```
+DEEPSEEK_API_KEY=tu-api-key-de-deepseek
