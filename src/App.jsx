@@ -13,56 +13,22 @@ const Cults3DGenerator = () => {
     setLoading(true);
     
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          messages: [
-            {
-              role: "user",
-              content: `Genera contenido para Cults3D de una figura STL de: "${figureName}"
-
-Debes responder ÚNICAMENTE con un JSON válido con esta estructura exacta (sin markdown, sin backticks):
-{
-  "title": "título SEO optimizado",
-  "description": "descripción en markdown con detalles técnicos, versiones incluidas, y para qué es ideal",
-  "tags": "tag1, tag2, tag3, tag4, tag5, tag6, tag7, tag8, tag9, tag10",
-  "baseName": "nombre-base-para-imagenes-separado-por-guiones",
-  "imageNames": {
-    "main": "nombre-main",
-    "front": "nombre-front-view",
-    "side": "nombre-side-view",
-    "back": "nombre-back-view",
-    "animated": "nombre-animated-gif",
-    "detail": "nombre-detail",
-    "render": "nombre-raw-render"
-  },
-  "salesTip": "consejo de ventas relevante"
-}
-
-Importante: 
-- El título debe ser atractivo y con keywords relevantes
-- La descripción debe incluir características técnicas, versiones (pre-supported solid, hollow with drain holes)
-- Tags separados por comas, mínimo 15 tags relevantes
-- Base name y todos los image names en minúsculas con guiones
-- Sales tip específico para este tipo de figura`
-            }
-          ],
+          figureName: figureName
         })
       });
 
+      if (!response.ok) {
+        throw new Error('Error al generar contenido');
+      }
+
       const data = await response.json();
-      const content = data.content[0].text;
-      
-      // Limpiar posibles backticks de markdown
-      const cleanContent = content.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(cleanContent);
-      
-      setGeneratedData(parsed);
+      setGeneratedData(data);
     } catch (error) {
       console.error('Error:', error);
       alert('Error al generar contenido. Por favor, intenta de nuevo.');
